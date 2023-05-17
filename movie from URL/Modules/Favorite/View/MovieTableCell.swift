@@ -9,7 +9,7 @@ import UIKit
 
 class MovieTableCell: UICollectionViewCell {
     
-    let dSourceInstance = DataSource.getInstance
+    let dSourceInstance = CoreDataDataSource.getInstance
     var itemToAddToFav: Item?
 
     var isFavorite: Bool?
@@ -43,17 +43,5 @@ class MovieTableCell: UICollectionViewCell {
      
     }
     
-//    func setAlert(message : String , actionName: String){
-//
-//        let alert = UIAlertController.init(title: "Alert", message: message, preferredStyle: .alert)
-//
-//        alert.addAction(UIAlertAction(title: actionName, style: .default , handler: { UIAlertAction in
-//            
-//            print("Ok..")
-//        }))
-//        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-//
-//        present(alert, animated: true, completion: nil)
-//
-//    }
+
 }

@@ -5,26 +5,44 @@
 //  Created by Mac on 08/05/2023.
 //
 
+
 import UIKit
 
-class FavoriteScreen: UIViewController , UITableViewDelegate , UITableViewDataSource {
+protocol FavoriteViewProtocol : AnyObject{
+    
+    
+}
+
+
+
+class FavoriteScreen: UIViewController , UITableViewDelegate , UITableViewDataSource , FavoriteViewProtocol{
  
     
 
     @IBOutlet weak var btnBackToAddFavMovie: UIButton!
     @IBOutlet weak var tv_noMovies: UILabel!
     @IBOutlet weak var myTableView: UITableView!
-    let dataSourceInstance = DataSource.getInstance
+    
     var favMoviesArray : [Item] = []
+    var presenter : FavoritePresenter!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         myTableView.delegate = self
         myTableView.dataSource = self
+        presenter = FavoritePresenter(view: self)
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        favMoviesArray = dataSourceInstance.loadDataFromDB(isFromFav: true)
+        presenter.loadFavItemsFromDB()
+        favMoviesArray = presenter.favMoviesArray
+        
+        refrashViewAfter()
+       
+    }
+    
+    func refrashViewAfter(){
         if favMoviesArray.isEmpty
         {
             myTableView.isHidden = true
@@ -37,19 +55,12 @@ class FavoriteScreen: UIViewController , UITableViewDelegate , UITableViewDataSo
             btnBackToAddFavMovie.isHidden = true
             self.myTableView.reloadData()
         }
-       
     }
     
-    @IBAction func action(_ sender: Any) {
-        print("Clicked out side ")
+    @IBAction func backToHomeAddMoviesToFavAction(_ sender: Any) {
         if let tab = self.tabBarController {
-            print("Clicked ")
             tab.selectedIndex = 0
         }
-    }
-    @IBAction func backToAddMoviesAction(_ sender: UIButton) {
-        
-       
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -98,11 +109,16 @@ class FavoriteScreen: UIViewController , UITableViewDelegate , UITableViewDataSo
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
         if editingStyle == .delete {
+            //show alert
             Utilities.getInstance.showAlertWithTwoActions(inside: self, title: Utilities.getInstance.deleteMovieAlertTitle, message: Utilities.getInstance.deleteMovieAlertMessage, firstActionHeader: {
                 
-                self.dataSourceInstance.deleteMovie(id: (self.favMoviesArray[indexPath.row].id!), isFromFav: true)
+                self.presenter.deleteItemFromFav(id: self.favMoviesArray[indexPath.row].id!)
+                
                 self.favMoviesArray.remove(at: indexPath.row)
+                
                 tableView.deleteRows(at: [indexPath], with: .automatic)
+                
+                self.refrashViewAfter()
                 
             })
         }
@@ -117,3 +133,4 @@ class FavoriteScreen: UIViewController , UITableViewDelegate , UITableViewDataSo
     
 
 }
+

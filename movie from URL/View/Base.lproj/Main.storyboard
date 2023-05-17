@@ -49,7 +49,7 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" title=" Click to add some"/>
                                 <connections>
-                                    <action selector="action:" destination="XTT-Tx-0Gt" eventType="touchUpInside" id="wIL-Zz-6ZW"/>
+                                    <action selector="backToHomeAddMoviesToFavAction:" destination="XTT-Tx-0Gt" eventType="touchUpInside" id="MiP-mu-egD"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -73,7 +73,7 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Favorite" image="heart.fill" catalog="system" id="u5J-6q-uFl"/>
                     <connections>
-                        <outlet property="btnBackToAddFavMovie" destination="Ob1-YV-4X6" id="ap2-mV-T40"/>
+                        <outlet property="btnBackToAddFavMovie" destination="Ob1-YV-4X6" id="8Xj-3C-ym4"/>
                         <outlet property="myTableView" destination="yZg-7g-low" id="BE8-gg-lt4"/>
                         <outlet property="tv_noMovies" destination="Vva-NC-BEJ" id="Bdk-VX-052"/>
                     </connections>

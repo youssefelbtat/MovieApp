@@ -7,52 +7,48 @@
 
 import UIKit
 import Kingfisher
-class HomeScreen: UIViewController,UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout  {
+
+protocol HomeViewProtocol : AnyObject{
+    
+    func renderCollectionView ()
+    
+}
+
+
+
+class HomeScreen: UIViewController,HomeViewProtocol,UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout  {
    
     @IBOutlet weak var MyCollectionView: UICollectionView!
     
     @IBOutlet weak var tvNoData: UILabel!
     
-    let getItemsInstance = DataSource.getInstance
-    var allItemsArray : [Item]?
-    var favItemsArray : [Item]?
-    let getConnectivityInstance = Connectivity.sharedInstance
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    var presenter : HomePresenter!
     
-        let indicator = UIActivityIndicatorView(style: .large)
+  
+
+    var indicator : UIActivityIndicatorView!
+    override func viewDidLoad() {
+        presenter = HomePresenter(view: self)
+        super.viewDidLoad()
+     
+         indicator = UIActivityIndicatorView(style: .large)
         indicator.center = self.view.center
         self.view.addSubview(indicator)
         
         indicator.startAnimating()
-        
-        if getConnectivityInstance.isConnectedToInternet() {
-            getItemsInstance.loadDataFromAPI{ [weak self] (result) in
-                DispatchQueue.main.async {
-                    self!.getItemsInstance.deleteAllData()
-                    if let items = result?.items {
-                        self!.allItemsArray = items
-                        self!.getItemsInstance.insertDataToDB(items: items)
-                       
-                            }
-                    self!.MyCollectionView.dataSource = self
-                    self!.MyCollectionView.delegate = self
-                    indicator.stopAnimating()
-                }
-            }
-        }else{
-            
-            allItemsArray = getItemsInstance.loadDataFromDB(isFromFav: false)
-            MyCollectionView.dataSource = self
-            MyCollectionView.delegate = self
-            indicator.stopAnimating()
-        }
+        presenter.getDataFromAPI()
        
     }
+    func renderCollectionView() {
+        MyCollectionView.dataSource = self
+        MyCollectionView.delegate = self
+        self.indicator.stopAnimating()
+    }
     override func viewWillAppear(_ animated: Bool) {
-        allItemsArray = getItemsInstance.loadDataFromDB(isFromFav: false)
-        favItemsArray = getItemsInstance.loadDataFromDB(isFromFav: true)
-        if allItemsArray!.isEmpty{
+        
+        presenter.updataData()
+        
+        if presenter.allData.isEmpty{
             tvNoData.isHidden = false
             MyCollectionView.isHidden = true
         }else{
@@ -70,7 +66,7 @@ class HomeScreen: UIViewController,UICollectionViewDataSource, UICollectionViewD
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         
-        return allItemsArray?.count ?? 0
+        return presenter.allData?.count ?? 0
         
     }
     
@@ -83,7 +79,7 @@ class HomeScreen: UIViewController,UICollectionViewDataSource, UICollectionViewD
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "collection", for: indexPath) as! MovieTableCell
      
-        let url = URL(string: allItemsArray![indexPath.row].image!)!
+        let url = URL(string: presenter.allData![indexPath.row].image!)!
         
 
         cell.imgMovieImage.kf.indicatorType = .activity
@@ -96,9 +92,9 @@ class HomeScreen: UIViewController,UICollectionViewDataSource, UICollectionViewD
                 .cacheOriginalImage
             ])
         
-        cell.itemToAddToFav = allItemsArray![indexPath.row]
+        cell.itemToAddToFav = presenter.allData![indexPath.row]
         
-        if let isFavorited = favItemsArray?.contains(where: {$0.id == allItemsArray![indexPath.row].id}) {
+        if let isFavorited = presenter.favData?.contains(where: {$0.id == presenter.allData![indexPath.row].id}) {
             if isFavorited {
                 cell.isFavorite = true
                 cell.favIcon.setImage(UIImage(systemName: "heart.fill"),for: .normal)
@@ -109,7 +105,7 @@ class HomeScreen: UIViewController,UICollectionViewDataSource, UICollectionViewD
         }
             
         
-        cell.tvMovieTitle.text = allItemsArray![indexPath.row].header ?? "No Header"
+        cell.tvMovieTitle.text = presenter.allData![indexPath.row].header ?? "No Header"
         
         return cell
         
@@ -117,7 +113,7 @@ class HomeScreen: UIViewController,UICollectionViewDataSource, UICollectionViewD
      func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
          let sec = self.storyboard?.instantiateViewController(withIdentifier: "sec") as! ShowItemScreen
             
-         sec.itemDatels = allItemsArray![indexPath.row]
+         sec.itemDatels = presenter.allData![indexPath.row]
         navigationController?.pushViewController(sec, animated: true)
     }
     

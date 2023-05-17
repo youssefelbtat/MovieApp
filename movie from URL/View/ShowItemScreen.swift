@@ -11,7 +11,7 @@ class ShowItemScreen: UIViewController {
 
     var itemDatels : Item?
     var isFromFav : Bool = false
-    let dataSourceInstance = DataSource.getInstance
+    let dataSourceInstance = CoreDataDataSource.getInstance
     
     @IBOutlet weak var dimage: UIImageView!
     @IBOutlet weak var tvTitle: UILabel!

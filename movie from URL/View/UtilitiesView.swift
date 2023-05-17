@@ -11,7 +11,8 @@ class Utilities {
     
      static let getInstance = Utilities()
     
-     let deleteMovieAlertTitle = " Delete Movie !"
+    
+    let deleteMovieAlertTitle = " Delete Movie !"
     let deleteFromFavAlertTitle = " Remove from Favorites !"
     let addToFavAlertTitle = " Add To Favorites "
     let deleteMovieAlertMessage = "Are you sure you want to delete this movie?"

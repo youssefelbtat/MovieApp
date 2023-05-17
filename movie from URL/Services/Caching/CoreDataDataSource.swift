@@ -9,11 +9,19 @@ import Foundation
 import UIKit
 import CoreData
 
-class DataSource{
+
+protocol LocalDataSource {
+    func insertDataToDB(items : [Item])
+    func addItemToFav(item: Item)
+    func loadDataFromDB(isFromFav: Bool)->[Item]
+    func deleteMovie(id: String,isFromFav: Bool)
+    func deleteAllData()
+}
+
+class CoreDataDataSource : LocalDataSource{
     
-    static let getInstance = DataSource()
+    static let getInstance = CoreDataDataSource()
     
-    private let url = URL(string: "https://imdb-api.com/en/API/BoxOffice/k_16j1chs1")
     private let favEntityName = "FavEntity"
     private let mainEntityName = "ItemEntity"
     private var manager : NSManagedObjectContext!
@@ -25,31 +33,6 @@ class DataSource{
         manager = appDelegate.persistentContainer.viewContext
     }
     
-    func loadDataFromAPI(compilitionHandler: @escaping (MyResult?) -> Void){
-        guard let urlFinal = url else {
-            return
-        }
-        let request = URLRequest(url: urlFinal)
-        let session = URLSession(configuration: .default)
-        let task = session.dataTask(with: request) { (data, response, error) in
-            guard let data = data else{
-                return
-            }
-            do{
-           
-                let result = try JSONDecoder().decode(MyResult.self, from: data)
-                print(result.items[0].header ?? "No title")
-                compilitionHandler(result)
-                
-            }catch let error{
-                print(error.localizedDescription)
-                compilitionHandler(nil)
-            }
-        }
-    
-        task.resume()
-        
-    }
     
     func insertDataToDB(items : [Item]){
         

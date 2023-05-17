@@ -9,7 +9,9 @@ import Foundation
 import Reachability
 
 class Connectivity {
+    
     static let sharedInstance = Connectivity()
+     let APIUrl =  "https://imdb-api.com/en/API/BoxOffice/k_16j1chs1"
     
     var reachability: Reachability? {
         do {
